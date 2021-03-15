@@ -2,7 +2,7 @@ import math
 import times
 import benchy
 
-let FarAway: float64 = 1000000.0
+let FarAway: float32 = 1000000.0
 
 type
   SurfaceType = enum
@@ -15,10 +15,10 @@ type
     b, g, r, a: uint8
 
   Vector = object
-    x, y, z: float64
+    x, y, z: float32
 
   Color = object
-    r, b, g: float64
+    r, b, g: float32
 
   Camera = object
     forward, right, up, pos: Vector
@@ -31,15 +31,15 @@ type
     case objectType: ObjectType
     of Sphere:
       center: Vector
-      radius2: float64
+      radius2: float32
     of Plane:
       normal: Vector
-      offset: float64
+      offset: float32
 
   Intersection = object
     thing: Thing
     ray: Ray
-    dist: float64
+    dist: float32
 
   Light = object
     pos: Vector
@@ -53,7 +53,7 @@ type
 
   SurfaceProperties = object
     diffuse, specular: Color
-    reflect, roughness: float64
+    reflect, roughness: float32
 
 let white        = Color(r: 1.0, g: 1.0, b: 1.0)
 let grey         = Color(r: 0.5, g: 0.5, b: 0.5)
@@ -68,10 +68,10 @@ proc Cross(v1: var Vector, v2: var Vector): Vector {.inline.} =
     z: v1.x * v2.y - v1.y * v2.x
   )
 
-proc Length(v: Vector): float64 {.inline.} =
+proc Length(v: Vector): float32 {.inline.} =
   return sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 
-proc Scale(v: Vector, k: float64): Vector {.inline.} =
+proc Scale(v: Vector, k: float32): Vector {.inline.} =
   return Vector(
     x: k * v.x,
     y: k * v.y,
@@ -79,15 +79,15 @@ proc Scale(v: Vector, k: float64): Vector {.inline.} =
   )
 
 proc Norm(v: Vector): Vector {.inline.} =
-  let mag: float64 = v.Length
-  var s:   float64
+  let mag: float32 = v.Length
+  var s:   float32
   if mag == 0:
     s = FarAway
   else:
     s = 1.0 / mag
   return v.Scale(s)
 
-proc Dot(v1: Vector, v2: Vector): float64 {.inline.} =
+proc Dot(v1: Vector, v2: Vector): float32 {.inline.} =
   return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 
 proc Add(v1: Vector, v2: Vector): Vector  =
@@ -104,7 +104,7 @@ proc Sub(v1: Vector, v2: Vector): Vector {.inline.} =
     z: v1.z - v2.z
   )
 
-proc Scale(color: Color, k: float64): Color {.inline.} =
+proc Scale(color: Color, k: float32): Color {.inline.} =
   return Color(
     r: k * color.r,
     g: k * color.g,
@@ -125,7 +125,7 @@ proc Add(a: Color, b: Color): Color {.inline.} =
     b: a.b + b.b
   )
 
-proc Legalize(c: float64): uint8 {.inline.} =
+proc Legalize(c: float32): uint8 {.inline.} =
   let x = (c * 255.0)
   if x < 0.0:
     return 0
@@ -189,11 +189,11 @@ proc ObjectIntersect(obj: Thing, ray: Ray): Intersection =
         result.thing = obj
         result.ray   = ray
 
-proc CreateSphere(center: Vector, radius: float64, surfaceType: SurfaceType): Thing =
+proc CreateSphere(center: Vector, radius: float32, surfaceType: SurfaceType): Thing =
   var r2 = radius * radius
   return Thing(surfaceType: surfaceType, objectType: Sphere, center: center, radius2: r2)
 
-proc CreatePlane(normal: Vector, offset: float64, surfaceType: SurfaceType): Thing =
+proc CreatePlane(normal: Vector, offset: float32, surfaceType: SurfaceType): Thing =
   return Thing(surfaceType: surfaceType, objectType: Plane,  normal: normal, offset: offset)
 
 proc GetSurfaceProperties(obj: Thing, pos: Vector): SurfaceProperties =
@@ -237,7 +237,7 @@ proc CreateScene(): Scene =
   return scene
 
 proc Intersections(scene: Scene, ray: Ray): Intersection =
-  var closest: float64 = FarAway
+  var closest: float32 = FarAway
   result.thing = nil
 
   for thing in scene.things:
@@ -247,7 +247,7 @@ proc Intersections(scene: Scene, ray: Ray): Intersection =
       closest = intersect.dist
   return result
 
-proc TestRay(scene: Scene, ray: Ray): float64  =
+proc TestRay(scene: Scene, ray: Ray): float32  =
   let isect = scene.Intersections(ray)
   if not isNil(isect.thing):
     return isect.dist
@@ -320,10 +320,10 @@ proc GetNaturalColor(scene: Scene, thing: Thing, pos: Vector, norm: Vector, rd: 
       result = result.Add(lcolor.Add(scolor))
 
 proc GetPoint(x: int, y: int, camera: Camera, screenWidth: int, screenHeight: int): Vector =
-  var sw = float64(screenWidth)
-  var sh = float64(screenHeight)
-  var xf = float64(x)
-  var yf = float64(y)
+  var sw = float32(screenWidth)
+  var sh = float32(screenHeight)
+  var xf = float32(x)
+  var yf = float32(y)
 
   var recenterX =  (xf - (sw / 2.0)) / 2.0 / sw
   var recenterY = -(yf - (sh / 2.0)) / 2.0 / sh
@@ -396,12 +396,9 @@ proc SaveRGBBitmap(bitmapData: seq[RgbColor], width: int, height: int, wBitsPerP
     discard file.writeBuffer(addr x, sizeof(RgbColor))
   file.close()
 
-
   #echo "CPU time [ms] ", diff
 
-
-
-proc main(): float =
+proc main(): float64 =
   var t1 = cpuTime()
   var scene  = CreateScene()
   var width  = 500
