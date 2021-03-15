@@ -60,24 +60,24 @@ let black        = Color(r: 0.0, g: 0.0, b: 0.0)
 let background   = Color(r: 0.0, g: 0.0, b: 0.0)
 let defaultColor = Color(r: 0.0, g: 0.0, b: 0.0)
 
-proc Cross(v1: var Vector, v2: var Vector): Vector =
+proc Cross(v1: var Vector, v2: var Vector): Vector {.inline.} =
   return Vector(
     x: v1.y * v2.z - v1.z * v2.y,
     y: v1.z * v2.x - v1.x * v2.z,
     z: v1.x * v2.y - v1.y * v2.x
   )
 
-proc Length(v: Vector): float64 =
+proc Length(v: Vector): float64 {.inline.} =
   return sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 
-proc Scale(v: Vector, k: float64): Vector =
+proc Scale(v: Vector, k: float64): Vector {.inline.} =
   return Vector(
     x: k * v.x,
     y: k * v.y,
     z: k * v.z
   )
 
-proc Norm(v: Vector): Vector =
+proc Norm(v: Vector): Vector {.inline.} =
   let mag: float64 = v.Length
   var s:   float64
   if mag == 0:
@@ -86,7 +86,7 @@ proc Norm(v: Vector): Vector =
     s = 1.0 / mag
   return v.Scale(s)
 
-proc Dot(v1: Vector, v2: Vector): float64 =
+proc Dot(v1: Vector, v2: Vector): float64 {.inline.} =
   return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 
 proc Add(v1: Vector, v2: Vector): Vector  =
@@ -96,35 +96,35 @@ proc Add(v1: Vector, v2: Vector): Vector  =
     z: v1.z + v2.z
   )
 
-proc Sub(v1: Vector, v2: Vector): Vector =
+proc Sub(v1: Vector, v2: Vector): Vector {.inline.} =
   return Vector(
     x: v1.x - v2.x,
     y: v1.y - v2.y,
     z: v1.z - v2.z
   )
 
-proc Scale(color: Color, k: float64): Color  =
+proc Scale(color: Color, k: float64): Color {.inline.} =
   return Color(
     r: k * color.r,
     g: k * color.g,
     b: k * color.b
   )
 
-proc Multiply(a: Color, b: Color): Color =
+proc Multiply(a: Color, b: Color): Color {.inline.} =
   return Color(
     r: a.r * b.r,
     g: a.g * b.g,
     b: a.b * b.b
   )
 
-proc Add(a: Color, b: Color): Color =
+proc Add(a: Color, b: Color): Color {.inline.} =
   return Color(
     r: a.r + b.r,
     g: a.g + b.g,
     b: a.b + b.b
   )
 
-proc Legalize(c: float64): uint8 =
+proc Legalize(c: float64): uint8 {.inline.} =
   let x = (c * 255.0)
   if x < 0.0:
     return 0
@@ -132,7 +132,7 @@ proc Legalize(c: float64): uint8 =
     return 255
   return uint8(x)
 
-proc ToDrawingColor(c: Color): RgbColor =
+proc ToDrawingColor(c: Color): RgbColor {.inline.} =
   var color: RgbColor
   color.r = Legalize(c.r)
   color.g = Legalize(c.g)
@@ -158,7 +158,7 @@ proc CreateCamera(pos: Vector, lookAt: Vector): Camera =
 
   return camera
 
-proc Normal(obj: Thing, pos: Vector): Vector =
+proc Normal(obj: Thing, pos: Vector): Vector {.inline.} =
   case obj.objectType:
     of Sphere:
       return pos.Sub(obj.center).Norm()
@@ -167,7 +167,7 @@ proc Normal(obj: Thing, pos: Vector): Vector =
   return Vector(x:0.0, y:0.0, z:0.0)
 
 proc ObjectIntersect(obj: Thing, ray: Ray): Intersection =
-  result = Intersection(thing: nil, ray: ray, dist: 0)
+  # result = Intersection(thing: nil, ray: ray, dist: 0)
   case obj.objectType:
     of Sphere:
       let eo = obj.center.Sub(ray.start)
@@ -246,7 +246,7 @@ proc Intersections(scene: Scene, ray: Ray): Intersection =
       closest = intersect.dist
   return result
 
-proc TestRay(scene: Scene, ray: Ray): float64 =
+proc TestRay(scene: Scene, ray: Ray): float64  =
   let isect = scene.Intersections(ray)
   if not isNil(isect.thing):
     return isect.dist
@@ -388,7 +388,6 @@ proc SaveRGBBitmap(bitmapData: seq[RgbColor], width: int, height: int, wBitsPerP
   bfh.bfSize = bfh.bfOffBits + bmpInfoHeader.biSizeImage
 
   var file = open(fileName, fmWrite )
-
   discard file.writeBuffer(addr bfh, sizeof(BITMAPFILEHEADER))
   discard file.writeBuffer(addr bmpInfoHeader, sizeof(BITMAPINFOHEADER))
   for c in bitmapData:
@@ -396,18 +395,19 @@ proc SaveRGBBitmap(bitmapData: seq[RgbColor], width: int, height: int, wBitsPerP
     discard file.writeBuffer(addr x, sizeof(RgbColor))
   file.close()
 
+proc main() =
+  var t1 = cpuTime()
+  var scene  = CreateScene()
+  var width  = 500
+  var height = 500
+  var stride = width * 4
+  var bitmapData = newSeq[RgbColor](width * height)
 
-var t1 = cpuTime()
-var scene  = CreateScene()
-var width  = 500
-var height = 500
-var stride = width * 4
-var bitmapData = newSeq[RgbColor](width * height)
+  RenderScene(scene, bitmapData, stride, width, height)
+  var t2 = cpuTime()
+  var diff = (t2 - t1) * 1000
+  echo "CPU time [ms] ", diff
 
-RenderScene(scene, bitmapData, stride, width, height)
-var t2 = cpuTime()
-var diff = (t2 - t1) * 1000
+  SaveRGBBitmap(bitmapData, width, height, 32, "nim-raytracer.bmp")
 
-echo "CPU time [ms] ", diff
-
-SaveRGBBitmap(bitmapData, width, height, 32, "nim-raytracer.bmp")
+main()

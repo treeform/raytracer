@@ -1,2 +1,1 @@
-nim c -d:release --opt:speed --passL:-s RayTracer.nim
-RayTracer.exe
+nim c -d:danger --debugger:native --passC:"-march=native" RayTracer.nim
