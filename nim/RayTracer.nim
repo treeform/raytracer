@@ -1,5 +1,6 @@
 import math
 import times
+import benchy
 
 let FarAway: float64 = 1000000.0
 
@@ -395,7 +396,12 @@ proc SaveRGBBitmap(bitmapData: seq[RgbColor], width: int, height: int, wBitsPerP
     discard file.writeBuffer(addr x, sizeof(RgbColor))
   file.close()
 
-proc main() =
+
+  #echo "CPU time [ms] ", diff
+
+
+
+proc main(): float =
   var t1 = cpuTime()
   var scene  = CreateScene()
   var width  = 500
@@ -406,8 +412,9 @@ proc main() =
   RenderScene(scene, bitmapData, stride, width, height)
   var t2 = cpuTime()
   var diff = (t2 - t1) * 1000
-  echo "CPU time [ms] ", diff
+  return diff
 
-  SaveRGBBitmap(bitmapData, width, height, 32, "nim-raytracer.bmp")
+  #SaveRGBBitmap(bitmapData, width, height, 32, "nim-raytracer.bmp")
 
-main()
+timeIt "ray trace":
+  keep main()
