@@ -123,11 +123,18 @@ ray trace ........................ 157.290 ms    164.497 ms    ±8.950    x30
 
 Oh great a 3ms win. Now we are faster then C. Great! Job done.
 
-Why are we using float64 everywhere? This is computer graphics not computational physics! Changing everyting to use float32 I get:
+Why is it using float64 everywhere? This is computer graphics not computational physics! Changing everything to use float32 I get:
 
 ```
 name ............................... min time      avg time    std dv   runs
 ray trace ........................ 137.195 ms    140.204 ms    ±4.783    x36
+```
+
+Man I totally forgot about --gc:arc. Adding that yields more speed:
+
+```
+name ............................... min time      avg time    std dv   runs
+ray trace ........................ 110.665 ms    119.449 ms    ±9.403    x41
 ```
 
 Next steps would be to review the algorithm, and maybe hand roll the SIMD instructions. But I am happy with the speedups.
