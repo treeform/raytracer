@@ -151,4 +151,11 @@ name ............................... min time      avg time    std dv   runs
 ray trace ........................ 116.443 ms    123.428 ms    ±9.589    x40
 ```
 
+ElegantBeef had this idea to put inline around every functions using `{.push inline.}` and that really put everything into over drive:
+
+```
+name ............................... min time      avg time    std dv   runs
+ray trace ......................... 76.682 ms     79.987 ms    ±6.304    x61
+```
+
 Next steps would be to review the algorithm, and maybe hand roll the SIMD instructions. But I am happy with the speedups.

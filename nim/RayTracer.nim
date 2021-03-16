@@ -4,6 +4,8 @@ import benchy
 
 let FarAway: float32 = 1000000.0
 
+
+
 type
   SurfaceType = enum
     ShinySurface, CheckerBoardSurface
@@ -61,24 +63,26 @@ let black        = Color(r: 0.0, g: 0.0, b: 0.0)
 let background   = Color(r: 0.0, g: 0.0, b: 0.0)
 let defaultColor = Color(r: 0.0, g: 0.0, b: 0.0)
 
-proc Cross(v1: var Vector, v2: var Vector): Vector {.inline.} =
+{.push inline.}
+
+proc Cross(v1: var Vector, v2: var Vector): Vector =
   return Vector(
     x: v1.y * v2.z - v1.z * v2.y,
     y: v1.z * v2.x - v1.x * v2.z,
     z: v1.x * v2.y - v1.y * v2.x
   )
 
-proc Length(v: Vector): float32 {.inline.} =
+proc Length(v: Vector): float32 =
   return sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 
-proc Scale(v: Vector, k: float32): Vector {.inline.} =
+proc Scale(v: Vector, k: float32): Vector =
   return Vector(
     x: k * v.x,
     y: k * v.y,
     z: k * v.z
   )
 
-proc Norm(v: Vector): Vector {.inline.} =
+proc Norm(v: Vector): Vector =
   let mag: float32 = v.Length
   var s:   float32
   if mag == 0:
@@ -87,7 +91,7 @@ proc Norm(v: Vector): Vector {.inline.} =
     s = 1.0 / mag
   return v.Scale(s)
 
-proc Dot(v1: Vector, v2: Vector): float32 {.inline.} =
+proc Dot(v1: Vector, v2: Vector): float32 =
   return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 
 proc Add(v1: Vector, v2: Vector): Vector  =
@@ -97,35 +101,35 @@ proc Add(v1: Vector, v2: Vector): Vector  =
     z: v1.z + v2.z
   )
 
-proc Sub(v1: Vector, v2: Vector): Vector {.inline.} =
+proc Sub(v1: Vector, v2: Vector): Vector =
   return Vector(
     x: v1.x - v2.x,
     y: v1.y - v2.y,
     z: v1.z - v2.z
   )
 
-proc Scale(color: Color, k: float32): Color {.inline.} =
+proc Scale(color: Color, k: float32): Color =
   return Color(
     r: k * color.r,
     g: k * color.g,
     b: k * color.b
   )
 
-proc Multiply(a: Color, b: Color): Color {.inline.} =
+proc Multiply(a: Color, b: Color): Color =
   return Color(
     r: a.r * b.r,
     g: a.g * b.g,
     b: a.b * b.b
   )
 
-proc Add(a: Color, b: Color): Color {.inline.} =
+proc Add(a: Color, b: Color): Color =
   return Color(
     r: a.r + b.r,
     g: a.g + b.g,
     b: a.b + b.b
   )
 
-proc Legalize(c: float32): uint8 {.inline.} =
+proc Legalize(c: float32): uint8 =
   let x = (c * 255.0)
   if x < 0.0:
     return 0
@@ -133,7 +137,7 @@ proc Legalize(c: float32): uint8 {.inline.} =
     return 255
   return uint8(x)
 
-proc ToDrawingColor(c: Color): RgbColor {.inline.} =
+proc ToDrawingColor(c: Color): RgbColor =
   var color: RgbColor
   color.r = Legalize(c.r)
   color.g = Legalize(c.g)
@@ -159,7 +163,7 @@ proc CreateCamera(pos: Vector, lookAt: Vector): Camera =
 
   return camera
 
-proc Normal(obj: Thing, pos: Vector): Vector {.inline.} =
+proc Normal(obj: Thing, pos: Vector): Vector =
   case obj.objectType:
     of Sphere:
       return pos.Sub(obj.center).Norm()
@@ -398,6 +402,7 @@ proc SaveRGBBitmap(bitmapData: seq[RgbColor], width: int, height: int, wBitsPerP
 
   #echo "CPU time [ms] ", diff
 
+
 proc main(): float64 =
   var t1 = cpuTime()
   var scene  = CreateScene()
@@ -406,12 +411,16 @@ proc main(): float64 =
   var stride = width * 4
   var bitmapData = newSeq[RgbColor](width * height)
 
+
   RenderScene(scene, bitmapData, stride, width, height)
   var t2 = cpuTime()
   var diff = (t2 - t1) * 1000
-  return diff
 
   #SaveRGBBitmap(bitmapData, width, height, 32, "nim-raytracer.bmp")
+
+  return diff
+
+{.pop.}
 
 timeIt "ray trace":
   keep main()
