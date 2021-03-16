@@ -137,4 +137,18 @@ name ............................... min time      avg time    std dv   runs
 ray trace ........................ 110.665 ms    119.449 ms    ±9.403    x41
 ```
 
+Wow some one mentioned link time optimizations `-d:lto` and it does give me 2ms as well:
+
+name ............................... min time      avg time    std dv   runs
+ray trace ........................ 108.075 ms    116.562 ms   ±10.240    x42
+
+Link time optimizations can be a huge win if you have a ton of different files.
+
+One idea was float is to not use ref object but use and object with an exists flag. Tried that, but it made it slower:
+
+```
+name ............................... min time      avg time    std dv   runs
+ray trace ........................ 116.443 ms    123.428 ms    ±9.589    x40
+```
+
 Next steps would be to review the algorithm, and maybe hand roll the SIMD instructions. But I am happy with the speedups.

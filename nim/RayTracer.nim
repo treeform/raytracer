@@ -173,15 +173,15 @@ proc ObjectIntersect(obj: Thing, ray: Ray): Intersection =
     of Sphere:
       let eo = obj.center.Sub(ray.start)
       let v  = eo.Dot(ray.dir)
-      var dist = 0.0
       if (v >= 0):
+        var dist = 0.0
         let disc = obj.radius2 - (eo.Dot(eo) - (v * v))
         if (disc >= 0):
             dist = v - sqrt(disc)
-      if (dist != 0.0):
-        result.thing = obj
-        result.ray   = ray
-        result.dist  = dist
+        if (dist != 0.0):
+          result.thing = obj
+          result.ray   = ray
+          result.dist  = dist
     of Plane:
       let denom = obj.normal.Dot(ray.dir)
       if (denom <= 0):
