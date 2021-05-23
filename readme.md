@@ -6,6 +6,7 @@ Raytracer benchmarks based on [Typescript](http://www.typescriptlang.org) sample
 
 | Language / Compiler  | Time [ms] |
 | -------------------- | --------- |
+| Nim                  | 067 ms   |
 | C++ (GCC)            | 160 ms    |
 | Fortran              | 160 ms    |
 | C (GCC)              | 160 ms    |
@@ -20,7 +21,6 @@ Raytracer benchmarks based on [Typescript](http://www.typescriptlang.org) sample
 | Java 8-14            | 600 ms    |
 | Delphi 2010 (32 bit) | 720 ms    |
 | Julia                | 900 ms    |
-| Nim                  | 1500 ms   |
 | F#                   | 1800 ms   |
 | Node                 | 1800 ms   |
 | HHVM                 | 11000 ms  |
@@ -42,12 +42,12 @@ Raytracer benchmarks based on [Typescript](http://www.typescriptlang.org) sample
 
 | Language   | Loc |
 | ---------- | --- |
+| Nim        | 264 |
 | Python     | 275 |
 | F#         | 300 |
 | Ruby       | 351 |
 | Julia      | 360 |
 | Typescript | 412 |
-| Nim        | 418 |
 | C#         | 426 |
 | C++        | 461 |
 | VB.NET     | 481 |
